@@ -2,9 +2,9 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { loginUser } from "./action";
 import { useRouter } from "next/navigation";
-import axios from "axios";
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
@@ -14,32 +14,20 @@ export default function LoginPage() {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
-
-    const API_URL = process.env.NEXT_PUBLIC_API_URL;
-
     try {
-      const response = await axios.post(
-        `${API_URL}/auth/login`,
-        {
-          email: formData.email, // Perbaiki format payload
-          password: formData.password,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          withCredentials: true,
-        }
-      );
+      const res = await loginUser(formData.email, formData.password);
+      setLoading(false);
 
-      // Jika login berhasil, Anda bisa melakukan sesuatu seperti menyimpan token atau mengalihkan ke halaman lain
-      console.log(response.data);
-      router.push("/"); // Misalnya, alihkan ke halaman dashboard
+      if (res.success) {
+        alert("Login berhasil!"); // Tampilkan alert jika login berhasil
+        router.push("/"); // Arahkan ke dashboard
+      } else {
+        alert(res.message); // Tampilkan pesan error jika login gagal
+      }
     } catch (error) {
       console.error(error);
+      setLoading(false);
       alert("Login gagal!"); // Tampilkan alert jika ada kesalahan
-    } finally {
-      setLoading(false); // Pastikan loading diatur kembali ke false
     }
   };
 
@@ -56,7 +44,7 @@ export default function LoginPage() {
               setFormData({ ...formData, email: e.target.value })
             }
             placeholder="Enter your email"
-            required // Validasi agar email tidak kosong
+            required // Menambahkan validasi agar email tidak kosong
           />
         </div>
         <div>
@@ -69,7 +57,7 @@ export default function LoginPage() {
               setFormData({ ...formData, password: e.target.value })
             }
             placeholder="Enter your password"
-            required // Validasi agar password tidak kosong
+            required // Menambahkan validasi agar password tidak kosong
           />
         </div>
         <Button type="submit" className="mt-4" disabled={loading}>
@@ -79,13 +67,3 @@ export default function LoginPage() {
     </div>
   );
 }
-
-// const res = await loginUser(formData.email, formData.password);
-// setLoading(false);
-
-// if (res.success) {
-//   alert("Login berhasil!"); // Tampilkan alert jika login berhasil
-//   router.push("/"); // Arahkan ke dashboard
-// } else {
-//   alert(res.message); // Tampilkan pesan error jika login gagal
-// }

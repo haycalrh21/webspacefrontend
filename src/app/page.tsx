@@ -71,7 +71,6 @@ export default function Home() {
             "Content-Type": "application/json",
             Authorization: `${token}`,
           },
-          withCredentials: true,
         }
       );
 
