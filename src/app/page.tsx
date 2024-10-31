@@ -4,31 +4,40 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { getServerSession } from "next-auth";
+import { useSession } from "next-auth/react";
+import { use, useEffect, useState } from "react";
+import {
+  authOptions,
+  CustomSession,
+} from "./api/auth/[...nextauth]/authOption";
 
 export default function Home() {
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
+  const { data: sessionData } = useSession() as { data: CustomSession | null };
 
   const [loading, setLoading] = useState(false);
   const [sessionStatus, setSessionStatus] = useState("");
+  console.log(sessionData?.user?.token);
   const [token, setToken] = useState("");
-  console.log(token);
-  useEffect(() => {
-    const fetchSession = async () => {
-      try {
-        const response = await axios.get(`/api/session`, {
-          withCredentials: true,
-        });
-        setToken(response.data.token); // Set token dari response
-        setSessionStatus("Session berhasil dimuat.");
-      } catch (error) {
-        console.error("Gagal memuat session:", error);
-        setSessionStatus("Gagal memuat session.");
-      }
-    };
 
-    fetchSession(); // Panggil API session
-  }, []);
+  // console.log(token);
+  // useEffect(() => {
+  //   const fetchSession = async () => {
+  //     try {
+  //       const response = await axios.get(`/api/session`, {
+  //         withCredentials: true,
+  //       });
+  //       setToken(response.data.token); // Set token dari response
+  //       setSessionStatus("Session berhasil dimuat.");
+  //     } catch (error) {
+  //       console.error("Gagal memuat session:", error);
+  //       setSessionStatus("Gagal memuat session.");
+  //     }
+  //   };
+
+  //   fetchSession(); // Panggil API session
+  // }, []);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -69,7 +78,7 @@ export default function Home() {
         {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `${token}`,
+            Authorization: `${sessionData?.user?.token}`,
           },
         }
       );

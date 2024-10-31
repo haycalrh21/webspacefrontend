@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import React, { useEffect, useState } from "react";
 import { loginUser } from "./action";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
@@ -15,14 +16,19 @@ export default function LoginPage() {
     event.preventDefault();
     setLoading(true);
     try {
-      const res = await loginUser(formData.email, formData.password);
+      const res = await signIn("credentials", {
+        redirect: false,
+        email: formData.email,
+        password: formData.password,
+      });
+
       setLoading(false);
 
-      if (res.success) {
+      if (res?.error) {
+        alert(res.error); // Tampilkan pesan error jika login gagal
+      } else {
         alert("Login berhasil!"); // Tampilkan alert jika login berhasil
         router.push("/"); // Arahkan ke dashboard
-      } else {
-        alert(res.message); // Tampilkan pesan error jika login gagal
       }
     } catch (error) {
       console.error(error);
@@ -30,7 +36,6 @@ export default function LoginPage() {
       alert("Login gagal!"); // Tampilkan alert jika ada kesalahan
     }
   };
-
   return (
     <div className="flex min-h-screen w-screen flex-col items-center justify-center">
       <form onSubmit={handleSubmit}>
