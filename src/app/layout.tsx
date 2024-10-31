@@ -1,19 +1,8 @@
+// app/layout.tsx
 import type { Metadata } from "next";
-import localFont from "next/font/local";
 import "./globals.css";
-
 import ProviderSession from "@/components/SessionProvider";
-
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-});
+import Navbar from "@/components/Navbar";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -27,8 +16,31 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        {/* Script untuk set dark mode sebelum render */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                const darkMode = localStorage.getItem('darkMode') === 'true';
+                document.documentElement.classList.toggle('dark', darkMode);
+                if (darkMode) {
+                  document.body.style.backgroundColor = '#1a1a1a'; // Warna latar belakang gelap
+                  document.body.style.color = '#ffffff'; // Warna teks gelap
+                } else {
+                  document.body.style.backgroundColor = '#ffffff'; // Warna latar belakang terang
+                  document.body.style.color = '#000000'; // Warna teks terang
+                }
+              })();
+            `,
+          }}
+        />
+      </head>
       <body>
-        <ProviderSession>{children}</ProviderSession>
+        <Navbar />
+        <div className="w-full h-screen bg-background dark:bg-black text-foreground dark:text-white">
+          <ProviderSession>{children}</ProviderSession>
+        </div>
       </body>
     </html>
   );

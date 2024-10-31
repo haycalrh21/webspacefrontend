@@ -37,38 +37,41 @@ export default function LoginPage() {
     }
   };
   return (
-    <div className="flex min-h-screen w-screen flex-col items-center justify-center">
-      <form onSubmit={handleSubmit}>
-        <div>
-          <Label htmlFor="email">Email</Label>
-          <Input
-            type="email"
-            id="email"
-            name="email"
-            onChange={(e) =>
-              setFormData({ ...formData, email: e.target.value })
-            }
-            placeholder="Enter your email"
-            required // Menambahkan validasi agar email tidak kosong
-          />
-        </div>
-        <div>
-          <Label htmlFor="password">Password</Label>
-          <Input
-            type="password"
-            id="password"
-            name="password"
-            onChange={(e) =>
-              setFormData({ ...formData, password: e.target.value })
-            }
-            placeholder="Enter your password"
-            required // Menambahkan validasi agar password tidak kosong
-          />
-        </div>
-        <Button type="submit" className="mt-4" disabled={loading}>
-          {loading ? "Loading..." : "Login"}
-        </Button>
-      </form>
+    <div className="flex py-10 items-center justify-center ">
+      <div className="bg-neutral-400 w-full max-w-md p-4 rounded-lg">
+        <h1 className="text-2xl font-bold text-center ">Login</h1>
+        <form onSubmit={handleSubmit}>
+          <div>
+            <Label htmlFor="email">Email</Label>
+            <Input
+              type="email"
+              id="email"
+              name="email"
+              onChange={(e) =>
+                setFormData({ ...formData, email: e.target.value })
+              }
+              placeholder="Enter your email"
+              required // Menambahkan validasi agar email tidak kosong
+            />
+          </div>
+          <div>
+            <Label htmlFor="password">Password</Label>
+            <Input
+              type="password"
+              id="password"
+              name="password"
+              onChange={(e) =>
+                setFormData({ ...formData, password: e.target.value })
+              }
+              placeholder="Enter your password"
+              required // Menambahkan validasi agar password tidak kosong
+            />
+          </div>
+          <Button type="submit" className="mt-4" disabled={loading}>
+            {loading ? "Loading..." : "Login"}
+          </Button>
+        </form>
+      </div>
     </div>
   );
 }
