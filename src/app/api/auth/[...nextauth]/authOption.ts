@@ -5,6 +5,7 @@ import { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+const nextAuthSecret = process.env.NEXTAUTH_SECRET;
 
 export interface CustomSession {
   user?: CustomUser;
@@ -23,6 +24,7 @@ export interface CustomUser {
 }
 
 export const authOptions: AuthOptions = {
+  secret: nextAuthSecret,
   pages: {
     signIn: "/login",
   },
