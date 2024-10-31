@@ -1,4 +1,5 @@
-import axios from "axios";
+import myAxios from "@/lib/axios.config";
+
 import { AuthOptions, ISODateString, User } from "next-auth";
 import { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
@@ -56,7 +57,7 @@ export const authOptions: AuthOptions = {
       },
       async authorize(credentials) {
         try {
-          const res = await axios.post(`${apiUrl}/auth/login`, credentials);
+          const res = await myAxios.post(`${apiUrl}/auth/login`, credentials);
           const response = res.data;
 
           const user = response?.user;
