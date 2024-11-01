@@ -13,7 +13,7 @@ export default function Navbar() {
     return null;
   }
   return (
-    <nav className="bg-background dark:bg-black p-4 w-full border-b border-black dark:border-gray-700">
+    <nav className="p-4 w-full bg-background dark:bg-black border-b border-black dark:border-gray-700">
       <div className="max-w-7xl mx-auto w-full">
         <div className="text-lg font-semibold flex items-center justify-between">
           <Link href="/">

@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import ProviderSession from "@/components/SessionProvider";
 import Navbar from "@/components/Navbar";
+import NavbarAvatar from "@/components/Navbars";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -37,10 +38,12 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <Navbar />
-        <div className="w-full h-screen bg-background dark:bg-black text-foreground dark:text-white">
-          <ProviderSession>{children}</ProviderSession>
-        </div>
+        <ProviderSession>
+          <NavbarAvatar />
+          <div className="w-full h-screen bg-background dark:bg-black text-foreground dark:text-white">
+            {children}
+          </div>
+        </ProviderSession>
       </body>
     </html>
   );
