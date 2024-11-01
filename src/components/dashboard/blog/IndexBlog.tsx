@@ -8,7 +8,7 @@ import {
 export default function IndexBlog({ data }: { data: any }) {
   return (
     <div className="flex flex-col gap-4 py-4">
-      <Accordion type="single" collapsible>
+      <Accordion type="multiple">
         {data.map((item: any) => (
           <AccordionItem key={item.blogId} value={`item-${item.blogId}`}>
             <AccordionTrigger>
