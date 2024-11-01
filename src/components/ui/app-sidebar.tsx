@@ -7,6 +7,7 @@ import {
   Home,
   ListCheck,
   MessageCircle,
+  Pencil,
   Slash,
 } from "lucide-react";
 
@@ -44,6 +45,19 @@ const managements = [
     title: "Roadmap",
     url: "/dashboard/roadmap",
     icon: Calendar,
+  },
+];
+
+const discuss = [
+  {
+    title: "Blog",
+    url: "/dashboard/blog",
+    icon: Pencil,
+  },
+  {
+    title: "Discussion",
+    url: "/dashboard/discussion",
+    icon: MessageCircle,
   },
 ];
 
@@ -87,6 +101,21 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {managements.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild>
+                    <Link href={item.url}>
+                      <item.icon />
+                      <span>{item.title}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+          <SidebarGroupLabel>Discuss</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {discuss.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <Link href={item.url}>
