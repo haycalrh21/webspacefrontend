@@ -18,3 +18,5 @@ export default function PageDiscuss({ data }: any) {
     </div>
   );
 }
+
+export const dynamic = "force-dynamic";
