@@ -1,5 +1,5 @@
-import AddDiscuss from "@/components/main/discuss/AddDiscuss";
-import CardDiscuss from "@/components/main/discuss/CardDiscuss";
+import PageDiscuss from "@/components/main/discuss/PageDiscuss";
+import Meteors from "@/components/ui/meteors";
 import React from "react";
 
 export default async function page() {
@@ -7,11 +7,13 @@ export default async function page() {
 
   const response = await fetch(`${API_URL}/discuss`);
   const data = await response.json();
-  // console.log(data);
+
   return (
-    <div className="p-4 max-w-7xl mx-auto">
-      <AddDiscuss />
-      <CardDiscuss data={data} />
+    <div className="relative    items-center justify-center overflow-hidden rounded-lg  ">
+      <div className="  p-4 max-w-7xl mx-auto">
+        <Meteors number={20} />
+        <PageDiscuss data={data} />
+      </div>
     </div>
   );
 }

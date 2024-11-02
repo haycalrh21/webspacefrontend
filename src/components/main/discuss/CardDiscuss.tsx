@@ -8,14 +8,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { listBlog } from "../blog/listBlog";
 import { useState, useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import DiscussDetailDialog from "./Discuss";
-
 import { MessageCircle } from "lucide-react";
+import { convertToWIB } from "@/lib/dateHelpers";
 
-// Skeleton component to match the Card structure
 const SkeletonCard = () => (
   <Card>
     <CardHeader>
@@ -32,12 +30,21 @@ const SkeletonCard = () => (
   </Card>
 );
 
-export default function CardDiscuss({ data }: any) {
+export default function CardDiscuss({ data, updateData }: any) {
   const [visibleItems, setVisibleItems] = useState(6);
   const [loading, setLoading] = useState(false);
   const [hasMoreItems, setHasMoreItems] = useState(true);
-  const [selectedBlog, setSelectedBlog] = useState(null); // State untuk menyimpan blog yang dipilih
-  const [isDialogOpen, setIsDialogOpen] = useState(false); // State untuk mengatur dialog
+  const [selectedBlog, setSelectedBlog] = useState(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  useEffect(() => {
+    // Reset visible items if new data is added
+    if (data.length > visibleItems) {
+      setHasMoreItems(true);
+    } else {
+      setHasMoreItems(false);
+    }
+  }, [data, visibleItems]);
 
   const handleScroll = () => {
     const bottom =
@@ -54,17 +61,17 @@ export default function CardDiscuss({ data }: any) {
     setLoading(true);
 
     setTimeout(() => {
-      const newVisibleItems = visibleItems + 5;
+      const newVisibleItems = visibleItems + 3; // Load 3 more items
 
-      if (newVisibleItems >= listBlog.length) {
+      if (newVisibleItems >= data.length) {
         setHasMoreItems(false);
-        setVisibleItems(listBlog.length);
+        setVisibleItems(data.length);
       } else {
         setVisibleItems(newVisibleItems);
       }
 
       setLoading(false);
-    }, 500);
+    }, 200);
   };
 
   useEffect(() => {
@@ -73,25 +80,37 @@ export default function CardDiscuss({ data }: any) {
   }, [visibleItems]);
 
   const openDialog = (blog: any) => {
-    setSelectedBlog(blog); // Set blog yang dipilih
-    setIsDialogOpen(true); // Buka dialog
+    setSelectedBlog(blog);
+    setIsDialogOpen(true);
   };
 
   const closeDialog = () => {
-    setIsDialogOpen(false); // Tutup dialog
-    setSelectedBlog(null); // Reset blog yang dipilih
+    setIsDialogOpen(false);
+    setSelectedBlog(null);
   };
+
+  // Sort data by createdAt in descending order
+  const sortedData = [...data].sort((a, b) => {
+    const dateA = new Date(a.createAt);
+    const dateB = new Date(b.createAt);
+
+    // Check if both dates are valid
+    if (isNaN(dateA.getTime()) || isNaN(dateB.getTime())) {
+      return 0; // Treat invalid dates as equal
+    }
+
+    return dateB.getTime() - dateA.getTime(); // Sort in descending order
+  });
 
   return (
     <div className="mt-4">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3">
-        {data.slice(0, visibleItems).map((item: any) => (
+        {sortedData.slice(0, visibleItems).map((item: any) => (
           <Card key={item.id} onClick={() => openDialog(item)}>
             <CardHeader>
               <CardTitle className="flex justify-between">
-                <p className="text-sm">@{item.username}</p>
-
-                <p className="text-sm">{item.createAt}</p>
+                <p className="text-sm">@{item.name}</p>
+                <p className="text-sm">{convertToWIB(item.createAt)}</p>
               </CardTitle>
               <p className="text-md">{item.title}</p>
             </CardHeader>
@@ -100,14 +119,12 @@ export default function CardDiscuss({ data }: any) {
             </CardContent>
             <CardFooter className="flex justify-start gap-2">
               <MessageCircle className="w-5 h-5" />
-              {/* {item.commentView}   */}
+              {/* {item.commentView} */}
             </CardFooter>
           </Card>
         ))}
         {loading && (
           <>
-            <SkeletonCard />
-            <SkeletonCard />
             <SkeletonCard />
             <SkeletonCard />
             <SkeletonCard />

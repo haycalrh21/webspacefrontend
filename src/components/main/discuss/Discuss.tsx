@@ -18,15 +18,16 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { convertToWIB } from "@/lib/dateHelpers";
 import { Label } from "@radix-ui/react-dropdown-menu";
 import axios from "axios";
 import { useSession } from "next-auth/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface Blog {
   id: number;
   title: string;
-  username: string;
+  name: string;
   description: string;
   createAt: string;
 }
@@ -44,19 +45,32 @@ const DiscussDetailDialog: React.FC<BlogDetailDialogProps> = ({
 }) => {
   if (!blog) return null;
   const { data: sessionData } = useSession() as { data: CustomSession | null };
+  const [loading, setLoading] = useState(false);
+  const [comment, setComment] = useState([]);
 
-  const [comment, setComment] = useState("");
-  console.log(sessionData?.user?.id);
+  const fetchComment = async () => {
+    const response = await fetch(`${API_URL}/comment`);
+    const data = await response.json();
+    const match = data.filter((item: any) => item.postId === blog.id);
+    setComment(match);
+    console.log(match);
+  };
+
+  useEffect(() => {
+    fetchComment();
+  }, []);
+  // console.log(sessionData?.user?.id);
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setLoading(true);
     try {
       const formData = new FormData(event.currentTarget);
       const comment = formData.get("comment") as string;
 
       const response = await axios.post(
-        `${API_URL}/discuss`,
+        `${API_URL}/comment`,
         {
           userId: sessionData?.user?.id,
           postId: blog.id,
@@ -68,9 +82,12 @@ const DiscussDetailDialog: React.FC<BlogDetailDialogProps> = ({
           },
         }
       );
-
-      console.log(response.data);
-    } catch (error) {}
+      setLoading(false);
+      fetchComment();
+    } catch (error) {
+      setLoading(false);
+      console.log(error);
+    }
   };
 
   const [isCommentFormVisible, setIsCommentFormVisible] = useState(false);
@@ -78,38 +95,6 @@ const DiscussDetailDialog: React.FC<BlogDetailDialogProps> = ({
   const openform = () => {
     setIsCommentFormVisible(true); // Reset blog yang dipilih
   };
-  const commentsData = [
-    {
-      id: 1,
-      comment: "This is a comment",
-      author: "John Doe",
-      date: "2023-01-01",
-    },
-    {
-      id: 2,
-      comment: "This is another comment",
-      author: "Jane Doe",
-      date: "2023-01-02",
-    },
-    {
-      id: 3,
-      comment: "This is yet another comment",
-      author: "Bob Smith",
-      date: "2023-01-03",
-    },
-    {
-      id: 4,
-      comment: "This is yet another comment",
-      author: "Bob Smith",
-      date: "2023-01-03",
-    },
-    {
-      id: 5,
-      comment: "This is yet another comment",
-      author: "Bob Smith",
-      date: "2023-01-03",
-    },
-  ];
 
   console.log(blog.id);
   return (
@@ -118,10 +103,10 @@ const DiscussDetailDialog: React.FC<BlogDetailDialogProps> = ({
         <DialogHeader>
           <DialogTitle className="text-foreground dark:text-gray-300 flex justify-between">
             <p className=" text-sm text-foreground dark:text-gray-300">
-              @{blog.username}
+              @{blog.name}
             </p>
             <p className="text-foreground dark:text-gray-300">
-              {blog.createAt}
+              {convertToWIB(blog.createAt)}
             </p>
           </DialogTitle>
           <p className="text-foreground dark:text-gray-300 text-md">
@@ -147,23 +132,27 @@ const DiscussDetailDialog: React.FC<BlogDetailDialogProps> = ({
                   name="comment"
                   placeholder="Type your comment here..."
                 />
-                <Button type="submit" className="btn btn-primary w-full">
-                  Submit
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  className="btn btn-primary w-full"
+                >
+                  {loading ? "Loading..." : "Submit"}
                 </Button>
               </form>
             )}
           </div>
         </DialogFooter>
         <div className="w-full mt-4">
-          {commentsData.length > 0 ? (
-            commentsData.map((item) => (
+          {comment.length > 0 ? (
+            comment.map((item: any) => (
               <Card key={item.id} className="flex justify-between mt-2">
                 <CardHeader>
-                  <CardTitle className="text-sm">@{item.author}</CardTitle>
+                  <CardTitle className="text-sm">@{item.username}</CardTitle>
                   {item.comment}
                 </CardHeader>
                 <CardContent></CardContent>
-                <CardFooter>{item.date}</CardFooter>
+                <CardFooter>{convertToWIB(item.createdAt)}</CardFooter>
               </Card>
             ))
           ) : (

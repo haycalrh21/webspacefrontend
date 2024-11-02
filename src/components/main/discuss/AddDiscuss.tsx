@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import axios from "axios";
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Select,
   SelectContent,
@@ -16,10 +16,25 @@ import {
 } from "@/components/ui/select";
 import { discusscategory } from "./listdiscuss";
 
-export default function AddDiscuss() {
+interface AddDiscussProps {
+  onSubmitSuccess: (newDiscuss: any) => void; // Define the function to accept the new discussion data
+}
+
+interface Discuss {
+  id: number;
+  title: string;
+  description: string;
+  createAt: string;
+  category: string;
+  userId: number;
+  name: string; // Menambahkan name sesuai dengan response yang diharapkan
+}
+
+export default function AddDiscuss({ onSubmitSuccess }: AddDiscussProps) {
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
   const { data: sessionData } = useSession() as { data: CustomSession | null };
   const [loading, setLoading] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false); // State untuk dialog
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -30,7 +45,6 @@ export default function AddDiscuss() {
       const description = formData.get("description") as string;
       const category = formData.get("category") as string;
 
-      // Kirim data ke backend
       const response = await axios.post(
         `${API_URL}/discuss`,
         {
@@ -46,9 +60,14 @@ export default function AddDiscuss() {
           },
         }
       );
+      const newDiscuss = {
+        ...response.data,
+        name: sessionData?.user?.name, // Tambahkan nama pengguna di sini
+      };
 
-      console.log(response.data);
-      alert(" berhasil!");
+      alert("Diskusi berhasil ditambahkan!");
+      setDialogOpen(false); // Tutup dialog setelah berhasil
+      onSubmitSuccess(newDiscuss);
     } catch (error) {
       console.error("Error:", error);
       alert("Upload gagal!");
@@ -56,52 +75,44 @@ export default function AddDiscuss() {
       setLoading(false);
     }
   };
+
   return (
-    <div className="justify-end items-end">
-      <div>
-        <h1 className="text-center text-3xl font-bold">Discuss</h1>
-      </div>
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button className="btn btn-primary">Add Discuss</Button>
-        </DialogTrigger>
-        <DialogContent>
-          <form onSubmit={handleSubmit}>
-            <Label htmlFor="title">Title</Label>
-            <Input
-              name="title"
-              id="title"
-              type="text"
-              className="w-full mb-4"
-            />
+    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      <DialogTrigger asChild>
+        <Button className="btn btn-primary">Add Discuss</Button>
+      </DialogTrigger>
+      <DialogContent>
+        <form onSubmit={handleSubmit}>
+          <Label htmlFor="title">Title</Label>
+          <Input name="title" id="title" type="text" className="w-full mb-4" />
 
-            <Label htmlFor="description">Description</Label>
-            <Input
-              name="description"
-              id="description"
-              type="text"
-              className="w-full mb-4"
-            />
-            <Label htmlFor="category">Category</Label>
-            <Select name="category">
-              <SelectTrigger className="w-full mb-4 text-foreground dark:text-gray-300">
-                <SelectValue placeholder="Select" />
-              </SelectTrigger>
-              <SelectContent>
-                {discusscategory.map((item) => (
-                  <SelectItem key={item.id} value={item.name}>
-                    {item.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <Label htmlFor="description">Description</Label>
+          <Input
+            name="description"
+            id="description"
+            type="text"
+            className="w-full mb-4"
+          />
 
-            <Button type="submit" disabled={loading}>
-              {loading ? "Uploading..." : "Submit"}
-            </Button>
-          </form>
-        </DialogContent>
-      </Dialog>
-    </div>
+          <Label htmlFor="category">Category</Label>
+          <Select name="category">
+            <SelectTrigger className="w-full mb-4 text-foreground dark:text-gray-300">
+              <SelectValue placeholder="Select" />
+            </SelectTrigger>
+            <SelectContent>
+              {discusscategory.map((item) => (
+                <SelectItem key={item.id} value={item.name}>
+                  {item.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Button type="submit" disabled={loading}>
+            {loading ? "Uploading..." : "Submit"}
+          </Button>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }
