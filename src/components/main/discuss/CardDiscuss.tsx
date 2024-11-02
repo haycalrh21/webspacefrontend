@@ -12,7 +12,7 @@ import { listBlog } from "../blog/listBlog";
 import { useState, useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import DiscussDetailDialog from "./Discuss";
-import { listDiscuss } from "./listdiscuss";
+
 import { MessageCircle } from "lucide-react";
 
 // Skeleton component to match the Card structure
@@ -32,7 +32,7 @@ const SkeletonCard = () => (
   </Card>
 );
 
-export default function CardDiscuss() {
+export default function CardDiscuss({ data }: any) {
   const [visibleItems, setVisibleItems] = useState(6);
   const [loading, setLoading] = useState(false);
   const [hasMoreItems, setHasMoreItems] = useState(true);
@@ -85,22 +85,22 @@ export default function CardDiscuss() {
   return (
     <div className="mt-4">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3">
-        {listDiscuss.slice(0, visibleItems).map((item) => (
+        {data.slice(0, visibleItems).map((item: any) => (
           <Card key={item.id} onClick={() => openDialog(item)}>
             <CardHeader>
               <CardTitle className="flex justify-between">
-                <p>{item.title}</p>
+                <p className="text-sm">@{item.username}</p>
 
-                <p className="text-sm">{item.date}</p>
+                <p className="text-sm">{item.createAt}</p>
               </CardTitle>
-              <p>{item.author}</p>
+              <p className="text-md">{item.title}</p>
             </CardHeader>
             <CardContent>
               <CardDescription>{item.description}</CardDescription>
             </CardContent>
             <CardFooter className="flex justify-start gap-2">
               <MessageCircle className="w-5 h-5" />
-              {item.commentView}
+              {/* {item.commentView}   */}
             </CardFooter>
           </Card>
         ))}

@@ -32,7 +32,7 @@ export default function AddDiscuss() {
 
       // Kirim data ke backend
       const response = await axios.post(
-        `${API_URL}/blog`,
+        `${API_URL}/discuss`,
         {
           userId: sessionData?.user?.id,
           title,
@@ -47,8 +47,8 @@ export default function AddDiscuss() {
         }
       );
 
-      //   console.log(response.data);
-      alert("Upload berhasil!");
+      console.log(response.data);
+      alert(" berhasil!");
     } catch (error) {
       console.error("Error:", error);
       alert("Upload gagal!");
