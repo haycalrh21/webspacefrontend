@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from "react";
 import AddDiscuss from "./AddDiscuss";
 import CardDiscuss from "./CardDiscuss";
-import axios from "axios";
 
 interface Discussion {
   id: number;
@@ -13,29 +12,12 @@ interface Discussion {
   createdAt: Date;
 }
 
-export default function PageDiscuss({ data }: any) {
-  const [discussions, setDiscussions] = useState<Discussion[]>([]);
-
-  // Fungsi untuk memuat data diskusi dari API
-  const fetchDiscussions = async () => {
-    try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/discuss`
-      );
-      setDiscussions(response.data); // Set data diskusi dari API
-    } catch (error) {
-      console.error("Error fetching discussions:", error);
-    }
-  };
-
-  useEffect(() => {
-    // Panggil fungsi fetchDiscussions saat komponen pertama kali dimuat
-    fetchDiscussions();
-  }, []);
+export default function PageDiscuss({ data }: { data: Discussion[] }) {
+  // Inisialisasi discussions dengan data awal dari prop
+  const [discussions, setDiscussions] = useState<Discussion[]>(data);
 
   const handleNewDiscuss = (newDiscuss: Discussion) => {
     setDiscussions((prev) => [newDiscuss, ...prev]); // Tambahkan diskusi baru ke state
-    fetchDiscussions(); // Ambil ulang data diskusi dari API setelah penambahan
   };
 
   return (

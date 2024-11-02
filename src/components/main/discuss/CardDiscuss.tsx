@@ -33,7 +33,11 @@ export default function CardDiscuss({ data, updateData }: any) {
     <div className="mt-4">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3">
         {data.map((item: any) => (
-          <Card key={item.id} onClick={() => openDialog(item)}>
+          <Card
+            key={item.id}
+            onClick={() => openDialog(item)}
+            className="transition-transform duration-200 hover:scale-105"
+          >
             <CardHeader>
               <CardTitle className="flex justify-between">
                 <p className="text-sm">@{item.name}</p>
@@ -50,13 +54,12 @@ export default function CardDiscuss({ data, updateData }: any) {
             </CardContent>
             <CardFooter className="flex justify-start gap-2">
               <MessageCircle className="w-5 h-5" />
-              {/* {item.commentView} */}
             </CardFooter>
           </Card>
         ))}
       </div>
 
-      {/* Dialog untuk menampilkan detail blog */}
+      {/* Dialog untuk menampilkan detail diskusi */}
       <DiscussDetailDialog
         isOpen={isDialogOpen}
         onClose={closeDialog}

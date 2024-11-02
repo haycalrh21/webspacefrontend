@@ -1,20 +1,22 @@
-import PageDiscuss from "@/components/main/discuss/PageDiscuss";
-import Meteors from "@/components/ui/meteors";
 import React from "react";
+import PageDiscuss from "@/components/main/discuss/PageDiscuss";
 
-export default async function page() {
+import myAxios from "@/lib/axios.config";
+
+export default async function Page() {
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
+  const response = await myAxios.get(`${API_URL}/discuss`);
+  const data = await response.data;
 
-  const response = await fetch(`${API_URL}/discuss`);
-  const data = await response.json();
+  // console.log(data);
 
   return (
-    <div className="relative    items-center justify-center overflow-hidden rounded-lg  ">
-      <div className="  p-4 max-w-7xl mx-auto">
-        <Meteors number={20} />
+    <div className="relative items-center justify-center overflow-hidden rounded-lg">
+      <div className="p-4 max-w-7xl mx-auto">
         <PageDiscuss data={data} />
       </div>
     </div>
   );
 }
+
 export const dynamic = "force-dynamic";
