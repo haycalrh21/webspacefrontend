@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/card";
 import { convertToWIB } from "@/lib/dateHelpers";
 import ReplayMessage from "./ReplayMessage";
+import moment from "moment";
 
 export default function CardIndexTelegram({ data }: any) {
   return (
@@ -41,7 +42,12 @@ export default function CardIndexTelegram({ data }: any) {
             <Card key={index}>
               <CardHeader>
                 <CardTitle className="text-md">{senderName}</CardTitle>
-                <CardDescription>{convertToWIB(date)}</CardDescription>
+                <CardDescription>
+                  {" "}
+                  {moment(date)
+                    .tz("Asia/Jakarta")
+                    .format("YYYY-MM-DD HH:mm:ss")}
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <p>{text}</p>
