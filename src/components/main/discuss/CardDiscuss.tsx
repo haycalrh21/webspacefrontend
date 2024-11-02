@@ -12,7 +12,7 @@ import { useState, useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import DiscussDetailDialog from "./Discuss";
 import { MessageCircle } from "lucide-react";
-import { convertToWIB } from "@/lib/dateHelpers";
+import moment from "moment-timezone"; // Impor Moment.js
 
 const SkeletonCard = () => (
   <Card>
@@ -38,7 +38,6 @@ export default function CardDiscuss({ data, updateData }: any) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   useEffect(() => {
-    // Reset visible items if new data is added
     if (data.length > visibleItems) {
       setHasMoreItems(true);
     } else {
@@ -46,22 +45,28 @@ export default function CardDiscuss({ data, updateData }: any) {
     }
   }, [data, visibleItems]);
 
-  const handleScroll = () => {
-    const bottom =
-      window.innerHeight + window.scrollY >=
-      document.documentElement.scrollHeight - 50;
+  useEffect(() => {
+    const handleScroll = () => {
+      const bottom =
+        window.innerHeight + window.scrollY >=
+        document.documentElement.scrollHeight - 50;
 
-    if (bottom && hasMoreItems) {
-      loadMoreItems();
-    }
-  };
+      if (bottom && hasMoreItems) {
+        loadMoreItems();
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [hasMoreItems, visibleItems, data]);
 
   const loadMoreItems = () => {
     if (loading) return;
+
     setLoading(true);
 
     setTimeout(() => {
-      const newVisibleItems = visibleItems + 3; // Load 3 more items
+      const newVisibleItems = visibleItems + 3;
 
       if (newVisibleItems >= data.length) {
         setHasMoreItems(false);
@@ -73,11 +78,6 @@ export default function CardDiscuss({ data, updateData }: any) {
       setLoading(false);
     }, 200);
   };
-
-  useEffect(() => {
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [visibleItems]);
 
   const openDialog = (blog: any) => {
     setSelectedBlog(blog);
@@ -94,7 +94,6 @@ export default function CardDiscuss({ data, updateData }: any) {
     const dateA = new Date(a.createAt);
     const dateB = new Date(b.createAt);
 
-    // Check if both dates are valid
     if (isNaN(dateA.getTime()) || isNaN(dateB.getTime())) {
       return 0; // Treat invalid dates as equal
     }
@@ -110,7 +109,12 @@ export default function CardDiscuss({ data, updateData }: any) {
             <CardHeader>
               <CardTitle className="flex justify-between">
                 <p className="text-sm">@{item.name}</p>
-                <p className="text-sm">{convertToWIB(item.createAt)}</p>
+                <p className="text-sm">
+                  {moment(item.created_at)
+                    .tz("Asia/Jakarta")
+                    .format("YYYY-MM-DD HH:mm:ss")}{" "}
+                  {/* Menggunakan Moment.js */}
+                </p>
               </CardTitle>
               <p className="text-md">{item.title}</p>
             </CardHeader>

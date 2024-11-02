@@ -21,6 +21,7 @@ import { Input } from "@/components/ui/input";
 import { convertToWIB } from "@/lib/dateHelpers";
 import { Label } from "@radix-ui/react-dropdown-menu";
 import axios from "axios";
+import moment from "moment";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 
@@ -29,7 +30,7 @@ interface Blog {
   title: string;
   name: string;
   description: string;
-  createAt: string;
+  created_at: string;
 }
 
 interface BlogDetailDialogProps {
@@ -106,7 +107,9 @@ const DiscussDetailDialog: React.FC<BlogDetailDialogProps> = ({
               @{blog.name}
             </p>
             <p className="text-foreground dark:text-gray-300">
-              {convertToWIB(blog.createAt)}
+              {moment(blog.created_at)
+                .tz("Asia/Jakarta")
+                .format("YYYY-MM-DD HH:mm:ss")}
             </p>
           </DialogTitle>
           <p className="text-foreground dark:text-gray-300 text-md">
@@ -152,7 +155,7 @@ const DiscussDetailDialog: React.FC<BlogDetailDialogProps> = ({
                   {item.comment}
                 </CardHeader>
                 <CardContent></CardContent>
-                <CardFooter>{convertToWIB(item.createdAt)}</CardFooter>
+                <CardFooter>{item.createdAt}</CardFooter>
               </Card>
             ))
           ) : (
