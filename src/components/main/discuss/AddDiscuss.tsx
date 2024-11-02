@@ -17,24 +17,14 @@ import {
 import { discusscategory } from "./listdiscuss";
 
 interface AddDiscussProps {
-  onSubmitSuccess: (newDiscuss: any) => void; // Define the function to accept the new discussion data
-}
-
-interface Discuss {
-  id: number;
-  title: string;
-  description: string;
-  createAt: string;
-  category: string;
-  userId: number;
-  name: string; // Menambahkan name sesuai dengan response yang diharapkan
+  onSubmitSuccess: (newDiscuss: any) => void;
 }
 
 export default function AddDiscuss({ onSubmitSuccess }: AddDiscussProps) {
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
   const { data: sessionData } = useSession() as { data: CustomSession | null };
   const [loading, setLoading] = useState(false);
-  const [dialogOpen, setDialogOpen] = useState(false); // State untuk dialog
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -60,14 +50,15 @@ export default function AddDiscuss({ onSubmitSuccess }: AddDiscussProps) {
           },
         }
       );
+
       const newDiscuss = {
         ...response.data,
-        name: sessionData?.user?.name, // Tambahkan nama pengguna di sini
+        name: sessionData?.user?.name,
       };
 
+      onSubmitSuccess(newDiscuss); // Panggil fungsi untuk update daftar diskusi
+      setDialogOpen(false);
       alert("Diskusi berhasil ditambahkan!");
-      setDialogOpen(false); // Tutup dialog setelah berhasil
-      onSubmitSuccess(newDiscuss);
     } catch (error) {
       console.error("Error:", error);
       alert("Upload gagal!");

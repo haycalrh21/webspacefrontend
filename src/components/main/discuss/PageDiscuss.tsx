@@ -1,28 +1,47 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import AddDiscuss from "./AddDiscuss";
 import CardDiscuss from "./CardDiscuss";
+import axios from "axios";
 
 interface Discussion {
-  id: number; // ID diskusi
-  userId: number; // ID pengguna yang membuat diskusi
-  title: string; // Judul diskusi
-  description: string; // Deskripsi diskusi
-  category: string; // Kategori diskusi
-  createdAt: Date; // Tanggal dan waktu pembuatan diskusi
+  id: number;
+  userId: number;
+  title: string;
+  description: string;
+  category: string;
+  createdAt: Date;
 }
 
-export default function PageDiscuss({ data }: { data: Discussion[] }) {
-  const [discussions, setDiscussions] = useState<Discussion[]>(data || []);
-  // Fungsi untuk memperbarui data setelah submit
-  const updateData = (newData: any) => {
-    setDiscussions((prevState: any) => [newData, ...prevState]); // Menambahkan data baru di depan
+export default function PageDiscuss({ data }: any) {
+  const [discussions, setDiscussions] = useState<Discussion[]>([]);
+
+  // Fungsi untuk memuat data diskusi dari API
+  const fetchDiscussions = async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/discuss`
+      );
+      setDiscussions(response.data); // Set data diskusi dari API
+    } catch (error) {
+      console.error("Error fetching discussions:", error);
+    }
+  };
+
+  useEffect(() => {
+    // Panggil fungsi fetchDiscussions saat komponen pertama kali dimuat
+    fetchDiscussions();
+  }, []);
+
+  const handleNewDiscuss = (newDiscuss: Discussion) => {
+    setDiscussions((prev) => [newDiscuss, ...prev]); // Tambahkan diskusi baru ke state
+    fetchDiscussions(); // Ambil ulang data diskusi dari API setelah penambahan
   };
 
   return (
     <div>
-      <AddDiscuss onSubmitSuccess={updateData} />
-      <CardDiscuss data={discussions} />
+      <AddDiscuss onSubmitSuccess={handleNewDiscuss} />
+      <CardDiscuss data={discussions} updateData={setDiscussions} />
     </div>
   );
 }
