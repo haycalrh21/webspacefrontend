@@ -42,12 +42,7 @@ export default function CardIndexTelegram({ data }: any) {
             <Card key={index}>
               <CardHeader>
                 <CardTitle className="text-md">{senderName}</CardTitle>
-                <CardDescription>
-                  {" "}
-                  {moment(date)
-                    .tz("Asia/Jakarta")
-                    .format("YYYY-MM-DD HH:mm:ss")}
-                </CardDescription>
+                <CardDescription>{date}</CardDescription>
               </CardHeader>
               <CardContent>
                 <p>{text}</p>

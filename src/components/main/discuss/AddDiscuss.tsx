@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 import {
@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/select";
 import { discusscategory } from "./listdiscuss";
 import { CommentsData, Discussion } from "@/types/types";
+import toast from "react-hot-toast";
 
 interface AddDiscussProps {
   onSubmitSuccess: (newDiscuss: Discussion, newComment: CommentsData) => void;
@@ -26,7 +27,7 @@ export default function AddDiscuss({ onSubmitSuccess }: AddDiscussProps) {
   const { data: sessionData } = useSession() as { data: CustomSession | null };
   const [loading, setLoading] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
-
+  console.log(sessionData);
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
@@ -36,6 +37,9 @@ export default function AddDiscuss({ onSubmitSuccess }: AddDiscussProps) {
       const description = formData.get("description") as string;
       const category = formData.get("category") as string;
 
+      if (!sessionData?.user?.id) {
+        return toast.error("Please login first!");
+      }
       const response = await axios.post(
         `${API_URL}/discuss`,
         {
@@ -64,10 +68,50 @@ export default function AddDiscuss({ onSubmitSuccess }: AddDiscussProps) {
       };
       onSubmitSuccess(newDiscuss, newComment); // Panggil fungsi untuk update daftar diskusi
       setDialogOpen(false);
-      alert("Diskusi berhasil ditambahkan!");
+      toast.success("Discuss Successfully Added!");
     } catch (error) {
-      console.error("Error:", error);
-      alert("Upload gagal!");
+      if (
+        axios.isAxiosError(error) &&
+        error.response &&
+        error.response.data &&
+        error.response.data.error
+      ) {
+        const errorMessages = error.response.data.error.map(
+          (err: any) => err.message
+        );
+
+        // Menampilkan pesan error dalam bentuk daftar yang rapi
+        toast.custom(
+          (t) => (
+            <div
+              style={{
+                padding: "16px",
+                backgroundColor: "#f8d7da",
+                color: "#721c24",
+                borderRadius: "8px",
+                boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
+                minWidth: "250px",
+              }}
+              onClick={() => toast.dismiss(t.id)}
+            >
+              <strong style={{ fontSize: "16px" }}>Error:</strong>
+              <ul style={{ marginTop: "8px", paddingLeft: "20px" }}>
+                {errorMessages.map((msg: any, index: number) => (
+                  <li
+                    key={index}
+                    style={{ marginBottom: "4px", fontSize: "14px" }}
+                  >
+                    {msg}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ),
+          { duration: 2000 }
+        );
+      } else {
+        toast.error("Something went wrong. Please try again later.");
+      }
     } finally {
       setLoading(false);
     }

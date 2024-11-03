@@ -60,10 +60,15 @@ export default function CardDiscuss({
               </CardHeader>
               <CardContent>
                 <CardDescription>{item.description}</CardDescription>
-                <span className="text-sm text-foreground dark:text-gray-300 rounded-md bg-primary px-2 py-1 bg-red-500">
+                <span
+                  className={`text-sm text-foreground dark:text-gray-300 rounded-md px-2 py-1 ${
+                    item.category === "Bug" ? "bg-red-500" : "bg-green-500"
+                  }`}
+                >
                   {item.category}
                 </span>
               </CardContent>
+
               <CardFooter className="flex justify-start gap-2">
                 <MessageCircle className="w-5 h-5" />
                 {match.length}{" "}

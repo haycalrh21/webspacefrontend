@@ -6,6 +6,7 @@ import React, { useEffect, useState } from "react";
 
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
+import toast from "react-hot-toast";
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
@@ -24,10 +25,11 @@ export default function LoginPage() {
 
       setLoading(false);
 
-      if (res?.error) {
-        alert(res.error); // Tampilkan pesan error jika login gagal
+      if (res?.status === 401) {
+        console.log(res);
+        toast.error(res.error);
       } else {
-        alert("Login berhasil!"); // Tampilkan alert jika login berhasil
+        toast.success("Login success!");
         router.push("/"); // Arahkan ke dashboard
       }
     } catch (error) {

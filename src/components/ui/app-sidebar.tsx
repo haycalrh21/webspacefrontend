@@ -92,7 +92,7 @@ const Setting = [
     icon: ArrowBigRightIcon,
   },
 ];
-export function AppSidebar() {
+export function AppSidebar({ session }: { session: any }) {
   return (
     <Sidebar>
       <SidebarContent>
@@ -173,6 +173,7 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+        <p>{session.user.name}</p>
         <ButtonDarkMode />
       </SidebarContent>
     </Sidebar>

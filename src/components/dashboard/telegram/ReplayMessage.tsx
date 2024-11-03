@@ -10,7 +10,7 @@ export default function ReplayMessage({ id }: { id: number }) {
   const [loading, setLoading] = useState(false);
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
   const handleReply = async (event: React.FormEvent<HTMLFormElement>) => {
-    console.log("Reply");
+    // console.log("Reply");
     setLoading(true);
     try {
       const formData = new FormData(event.currentTarget);

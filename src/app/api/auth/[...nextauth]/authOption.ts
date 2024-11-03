@@ -1,7 +1,8 @@
 import myAxios from "@/lib/axios.config";
 
-import { AuthOptions, ISODateString, User } from "next-auth";
-import { JWT } from "next-auth/jwt";
+import { AuthOptions, ISODateString } from "next-auth";
+import { AxiosError } from "axios"; // Import AxiosError to handle axios-specific errors
+
 import CredentialsProvider from "next-auth/providers/credentials";
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
@@ -10,7 +11,8 @@ const nextAuthSecret = process.env.NEXTAUTH_SECRET;
 export interface CustomSession {
   user?: CustomUser;
   expires: ISODateString;
-  token?: string; // Add this line
+  token?: string;
+  role?: string;
 }
 
 export interface CustomUser {
@@ -45,6 +47,7 @@ export const authOptions: AuthOptions = {
         ...session,
         user: token.user as CustomUser,
         token: token.token as string,
+        role: token.role as string,
       };
       return customSession;
     },
@@ -68,11 +71,15 @@ export const authOptions: AuthOptions = {
             user.token = response.token; // Simpan accessToken dari respons
             return user;
           } else {
-            return null; // Mengembalikan null jika user atau accessToken tidak ada
+            return null;
           }
         } catch (error) {
-          console.error("Login error:", error);
-          return null; // Mengembalikan null jika ada error saat login
+          if (error instanceof AxiosError) {
+            console.error("Login error:", error.response?.data); // Log specific error response data
+          } else {
+            console.error("An unexpected error occurred:", error);
+          }
+          return null; // Return null if there is an error during login
         }
       },
     }),

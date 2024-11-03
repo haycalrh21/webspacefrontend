@@ -23,6 +23,7 @@ import axios from "axios";
 import moment from "moment";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 interface Blog {
   id: number;
@@ -83,8 +84,51 @@ const DiscussDetailDialog: React.FC<BlogDetailDialogProps> = ({
         }
       );
       fetchComment();
+      setLoading(false);
+      toast.success("Comment Successfully Added!");
     } catch (error) {
-      console.error(error);
+      if (
+        axios.isAxiosError(error) &&
+        error.response &&
+        error.response.data &&
+        error.response.data.error
+      ) {
+        const errorMessages = error.response.data.error.map(
+          (err: any) => err.message
+        );
+
+        // Menampilkan pesan error dalam bentuk daftar yang rapi
+        toast.custom(
+          (t) => (
+            <div
+              style={{
+                padding: "16px",
+                backgroundColor: "#f8d7da",
+                color: "#721c24",
+                borderRadius: "8px",
+                boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
+                minWidth: "250px",
+              }}
+              onClick={() => toast.dismiss(t.id)}
+            >
+              <strong style={{ fontSize: "16px" }}>Error:</strong>
+              <ul style={{ marginTop: "8px", paddingLeft: "20px" }}>
+                {errorMessages.map((msg: any, index: number) => (
+                  <li
+                    key={index}
+                    style={{ marginBottom: "4px", fontSize: "14px" }}
+                  >
+                    {msg}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ),
+          { duration: 2000 }
+        );
+      } else {
+        toast.error("Something went wrong. Please try again later.");
+      }
     } finally {
       setLoading(false);
     }
@@ -115,7 +159,11 @@ const DiscussDetailDialog: React.FC<BlogDetailDialogProps> = ({
           </p>
           <DialogDescription className="text-md text-foreground dark:text-gray-300 py-4 text-left">
             {blog.description} <br />
-            <span className="text-sm text-foreground dark:text-gray-300 rounded-md bg-primary px-2 py-1 bg-red-500">
+            <span
+              className={`text-sm text-foreground dark:text-gray-300 rounded-md px-2 py-1 ${
+                blog.category === "Bug" ? "bg-red-500" : "bg-green-500"
+              }`}
+            >
               {blog.category}
             </span>
           </DialogDescription>
