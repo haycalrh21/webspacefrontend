@@ -1,11 +1,12 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import AddDiscuss from "./AddDiscuss";
 import CardDiscuss from "./CardDiscuss";
 import { CommentsData, Discussion } from "@/types/types";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { Loader2 } from "lucide-react";
+
 // Fetch all discussions
 const fetchDiscussions = async () => {
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -25,6 +26,8 @@ export default function PageDiscuss() {
   const [visibleDiscussions, setVisibleDiscussions] = useState<Discussion[]>(
     []
   );
+  const [hasMore, setHasMore] = useState(true);
+  const loaderRef = useRef<HTMLDivElement>(null);
 
   // Query for discussions
   const { data: discussions = [], isLoading: loadingDiscussions } = useQuery({
@@ -42,34 +45,40 @@ export default function PageDiscuss() {
   useEffect(() => {
     if (discussions.length > 0) {
       setVisibleDiscussions(discussions.slice(0, 6));
+      setHasMore(discussions.length > 6);
     }
   }, [discussions]);
 
-  // Load more discussions on scroll
+  // Intersection Observer setup
   useEffect(() => {
-    const handleScroll = () => {
-      const bottom =
-        window.innerHeight + window.scrollY >= document.body.offsetHeight - 100;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const target = entries[0];
+        if (target.isIntersecting && hasMore) {
+          // Load 3 more items
+          const currentLength = visibleDiscussions.length;
+          const nextItems = discussions.slice(currentLength, currentLength + 3);
 
-      if (bottom) {
-        const currentLength = visibleDiscussions.length;
-
-        if (currentLength + 3 >= discussions.length) {
-          // If next load would exceed total, show all remaining
-          setVisibleDiscussions(discussions);
-        } else if (currentLength < discussions.length) {
-          // Load next 3 items
-          setVisibleDiscussions(discussions.slice(0, currentLength + 3));
+          if (nextItems.length > 0) {
+            setVisibleDiscussions((prev) => [...prev, ...nextItems]);
+            // Check if we've reached the end
+            setHasMore(currentLength + 3 < discussions.length);
+          }
         }
+      },
+      {
+        root: null,
+        rootMargin: "20px",
+        threshold: 1.0,
       }
-    };
+    );
 
-    window.addEventListener("scroll", handleScroll);
+    if (loaderRef.current) {
+      observer.observe(loaderRef.current);
+    }
 
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, [visibleDiscussions, discussions]);
+    return () => observer.disconnect();
+  }, [visibleDiscussions, discussions, hasMore]);
 
   // Mutation for adding new discussion
   const addDiscussionMutation = useMutation({
@@ -116,6 +125,13 @@ export default function PageDiscuss() {
     <div className="space-y-4">
       <AddDiscuss onSubmitSuccess={handleNewDiscuss} />
       <CardDiscuss data={visibleDiscussions} comment={comments} />
+
+      {/* Loader reference element */}
+      {hasMore && (
+        <div ref={loaderRef} className="flex justify-center items-center py-8">
+          <Loader2 className="h-6 w-6 animate-spin text-primary" />
+        </div>
+      )}
     </div>
   );
 }
