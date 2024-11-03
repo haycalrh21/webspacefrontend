@@ -18,7 +18,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-
 import { Label } from "@radix-ui/react-dropdown-menu";
 import axios from "axios";
 import moment from "moment";
@@ -31,6 +30,7 @@ interface Blog {
   name: string;
   description: string;
   created_at: string;
+  category: string;
 }
 
 interface BlogDetailDialogProps {
@@ -54,13 +54,12 @@ const DiscussDetailDialog: React.FC<BlogDetailDialogProps> = ({
     const data = await response.json();
     const match = data.filter((item: any) => item.postId === blog.id);
     setComment(match);
-    // console.log(match);
   };
 
   useEffect(() => {
     fetchComment();
   }, []);
-  // console.log(sessionData?.user?.id);
+
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -70,7 +69,7 @@ const DiscussDetailDialog: React.FC<BlogDetailDialogProps> = ({
       const formData = new FormData(event.currentTarget);
       const comment = formData.get("comment") as string;
 
-      const response = await axios.post(
+      await axios.post(
         `${API_URL}/comment`,
         {
           userId: sessionData?.user?.id,
@@ -83,47 +82,48 @@ const DiscussDetailDialog: React.FC<BlogDetailDialogProps> = ({
           },
         }
       );
-      setLoading(false);
       fetchComment();
     } catch (error) {
+      console.error(error);
+    } finally {
       setLoading(false);
-      console.log(error);
     }
   };
 
   const [isCommentFormVisible, setIsCommentFormVisible] = useState(false);
 
-  const openform = () => {
-    setIsCommentFormVisible(true); // Reset blog yang dipilih
+  const openForm = () => {
+    setIsCommentFormVisible(true);
   };
 
-  // console.log(blog.id);
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="scroll-hidden max-w-[800px] w-full p-10 max-h-[80vh]">
+      <DialogContent className="max-w-[800px] w-full p-6 md:p-10 max-h-[80vh] scroll-hidden">
         <DialogHeader>
-          <DialogTitle className="text-foreground dark:text-gray-300 flex justify-between">
-            <p className=" text-sm text-foreground dark:text-gray-300">
+          <DialogTitle className="flex justify-between items-start">
+            <span className="text-sm text-foreground dark:text-gray-300">
               @{blog.name}
-            </p>
-            <p className="text-foreground dark:text-gray-300">
+            </span>
+            <span className="text-foreground dark:text-gray-300">
               {moment(blog.created_at)
                 .tz("Asia/Jakarta")
                 .format("YYYY-MM-DD HH:mm:ss")}
-            </p>
+            </span>
           </DialogTitle>
-          <p className="text-foreground dark:text-gray-300 text-md">
+          <p className="text-lg font-semibold text-foreground dark:text-gray-300 mt-2 text-left">
             {blog.title}
           </p>
-          <p className="text-foreground dark:text-gray-300"></p>
-          <DialogDescription className="text-foreground dark:text-gray-300 text-md py-4">
-            {blog.description}
+          <DialogDescription className="text-md text-foreground dark:text-gray-300 py-4 text-left">
+            {blog.description} <br />
+            <span className="text-sm text-foreground dark:text-gray-300 rounded-md bg-primary px-2 py-1 bg-red-500">
+              {blog.category}
+            </span>
           </DialogDescription>
         </DialogHeader>
-        <DialogFooter className="items-start space-y-4">
+        <DialogFooter className="flex flex-col space-y-4">
           <div className="w-full">
             {!isCommentFormVisible ? (
-              <Button onClick={openform}>Comment</Button>
+              <Button onClick={openForm}>Comment</Button>
             ) : (
               <form className="w-full" onSubmit={handleSubmit}>
                 <Label className="text-foreground dark:text-gray-300 mb-2">
@@ -134,28 +134,32 @@ const DiscussDetailDialog: React.FC<BlogDetailDialogProps> = ({
                   className="w-full mb-2"
                   name="comment"
                   placeholder="Type your comment here..."
+                  required
                 />
-                <Button
-                  type="submit"
-                  disabled={loading}
-                  className="btn btn-primary w-full"
-                >
+                <Button type="submit" disabled={loading} className="w-full">
                   {loading ? "Loading..." : "Submit"}
                 </Button>
               </form>
             )}
           </div>
         </DialogFooter>
+
         <div className="w-full mt-4">
           {comment.length > 0 ? (
             comment.map((item: any) => (
-              <Card key={item.id} className="flex justify-between mt-2">
+              <Card
+                key={item.id}
+                className="flex flex-col justify-between mt-2"
+              >
                 <CardHeader>
-                  <CardTitle className="text-sm">@{item.username}</CardTitle>
-                  {item.comment}
+                  <CardTitle className="text-sm font-semibold">
+                    @{item.username}
+                  </CardTitle>
+                  <CardDescription className="text-sm">
+                    {item.comment}
+                  </CardDescription>
                 </CardHeader>
-                <CardContent></CardContent>
-                <CardFooter>
+                <CardFooter className="text-xs text-gray-500">
                   {moment(item.created_at)
                     .tz("Asia/Jakarta")
                     .format("YYYY-MM-DD HH:mm:ss")}
@@ -163,7 +167,7 @@ const DiscussDetailDialog: React.FC<BlogDetailDialogProps> = ({
               </Card>
             ))
           ) : (
-            <p className="text-foreground dark:text-gray-300">
+            <p className="text-foreground dark:text-gray-300 text-center">
               Tidak ada komentar
             </p>
           )}
