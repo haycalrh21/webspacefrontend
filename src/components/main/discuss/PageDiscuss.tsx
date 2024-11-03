@@ -7,34 +7,35 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { Loader2 } from "lucide-react";
 
-// Fetch all discussions
-const fetchDiscussions = async () => {
+// Fetch discussions from API
+const fetchDiscussions = async (): Promise<Discussion[]> => {
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
   const response = await axios.get(`${API_URL}/discuss`);
   return response.data;
 };
 
-// Fetch all comments
-const fetchComments = async () => {
+// Fetch comments from API
+const fetchComments = async (): Promise<CommentsData[]> => {
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
   const response = await axios.get(`${API_URL}/comment`);
   return response.data;
 };
 
-export default function PageDiscuss() {
+const PageDiscuss: React.FC = () => {
   const queryClient = useQueryClient();
   const [visibleDiscussions, setVisibleDiscussions] = useState<Discussion[]>(
     []
   );
   const [hasMore, setHasMore] = useState(true);
   const loaderRef = useRef<HTMLDivElement>(null);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   // Query for discussions
   const {
     data: discussions = [],
     isLoading: loadingDiscussions,
     isError: discussionsError,
-  } = useQuery({
+  } = useQuery<Discussion[]>({
     queryKey: ["discussions"],
     queryFn: fetchDiscussions,
   });
@@ -44,53 +45,53 @@ export default function PageDiscuss() {
     data: comments = [],
     isLoading: loadingComments,
     isError: commentsError,
-  } = useQuery({
+  } = useQuery<CommentsData[]>({
     queryKey: ["comments"],
     queryFn: fetchComments,
   });
 
-  // Initialize with 6 items
+  // Initialize visible discussions when discussions are fetched
   useEffect(() => {
     if (discussions.length > 0) {
-      setVisibleDiscussions(discussions.slice(0, 6));
-      setHasMore(discussions.length > 6);
+      setVisibleDiscussions(discussions.slice(0, 9));
+      setHasMore(discussions.length > 9);
     }
   }, [discussions]);
 
-  // Intersection Observer setup
+  // Intersection Observer for lazy loading
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         const target = entries[0];
-        if (target.isIntersecting && hasMore) {
-          // Load 3 more items
+        if (target.isIntersecting && hasMore && !isLoadingMore) {
+          setIsLoadingMore(true);
           const currentLength = visibleDiscussions.length;
           const nextItems = discussions.slice(currentLength, currentLength + 3);
 
           if (nextItems.length > 0) {
             setVisibleDiscussions((prev) => [...prev, ...nextItems]);
-            // Check if we've reached the end
-            setHasMore(currentLength + nextItems.length < discussions.length);
-          } else {
-            setHasMore(false); // No more items to load
           }
+
+          setHasMore(currentLength + nextItems.length < discussions.length);
+          setIsLoadingMore(false);
         }
       },
-      {
-        root: null,
-        rootMargin: "20px",
-        threshold: 1.0,
-      }
+      { root: null, rootMargin: "20px" }
     );
 
-    if (loaderRef.current) {
-      observer.observe(loaderRef.current);
+    const currentLoader = loaderRef.current;
+    if (currentLoader) {
+      observer.observe(currentLoader);
     }
 
-    return () => observer.disconnect();
-  }, [visibleDiscussions, discussions, hasMore]);
+    return () => {
+      if (currentLoader) {
+        observer.unobserve(currentLoader);
+      }
+    };
+  }, [visibleDiscussions, discussions, hasMore, isLoadingMore]);
 
-  // Mutation for adding new discussion
+  // Mutation for adding a new discussion
   const addDiscussionMutation = useMutation({
     mutationFn: async (newData: {
       newDiscuss: Discussion;
@@ -107,8 +108,6 @@ export default function PageDiscuss() {
         newData.newComment,
         ...oldData,
       ]);
-
-      // Update visible discussions when new item is added
       setVisibleDiscussions((prev) => [
         newData.newDiscuss,
         ...prev.slice(0, 5),
@@ -123,6 +122,7 @@ export default function PageDiscuss() {
     addDiscussionMutation.mutate({ newDiscuss, newComment });
   };
 
+  // Loading and error states
   if (loadingDiscussions || loadingComments) {
     return (
       <div className="flex justify-center items-center min-h-[200px]">
@@ -143,13 +143,13 @@ export default function PageDiscuss() {
     <div className="space-y-4">
       <AddDiscuss onSubmitSuccess={handleNewDiscuss} />
       <CardDiscuss data={visibleDiscussions} comment={comments} />
-
-      {/* Loader reference element */}
       {hasMore && (
-        <div ref={loaderRef} className="flex justify-center items-center py-4">
+        <div ref={loaderRef} className="flex justify-center items-center py-8">
           <Loader2 className="h-6 w-6 animate-spin text-primary" />
         </div>
       )}
     </div>
   );
-}
+};
+
+export default PageDiscuss;
