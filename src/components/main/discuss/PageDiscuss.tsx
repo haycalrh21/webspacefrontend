@@ -7,14 +7,12 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { Loader2 } from "lucide-react";
 
-// Fetch discussions dari API
 const fetchDiscussions = async (): Promise<Discussion[]> => {
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
   const response = await axios.get(`${API_URL}/discuss`);
   return response.data;
 };
 
-// Fetch comments dari API
 const fetchComments = async (): Promise<CommentsData[]> => {
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
   const response = await axios.get(`${API_URL}/comment`);
@@ -26,11 +24,9 @@ const PageDiscuss: React.FC = () => {
   const [visibleDiscussions, setVisibleDiscussions] = useState<Discussion[]>(
     []
   );
-  const [hasMore, setHasMore] = useState(true);
   const loaderRef = useRef<HTMLDivElement>(null);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
-  // Query untuk diskusi
   const {
     data: discussions = [],
     isLoading: loadingDiscussions,
@@ -38,9 +34,11 @@ const PageDiscuss: React.FC = () => {
   } = useQuery<Discussion[]>({
     queryKey: ["discussions"],
     queryFn: fetchDiscussions,
+    onSuccess: (data) => {
+      setVisibleDiscussions(data.slice(0, 9)); // Inisialisasi saat data berhasil diambil
+    },
   });
 
-  // Query untuk komentar
   const {
     data: comments = [],
     isLoading: loadingComments,
@@ -50,34 +48,26 @@ const PageDiscuss: React.FC = () => {
     queryFn: fetchComments,
   });
 
-  // Inisialisasi diskusi yang terlihat saat diskusi diambil
   useEffect(() => {
     if (discussions.length > 0) {
       setVisibleDiscussions(discussions.slice(0, 9));
-      setHasMore(discussions.length > 9);
     }
   }, [discussions]);
 
-  // Intersection Observer untuk lazy loading
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const target = entries[0];
-        if (target.isIntersecting && hasMore && !isLoadingMore) {
+    const observer = new IntersectionObserver((entries) => {
+      const target = entries[0];
+      if (target.isIntersecting && !isLoadingMore) {
+        const currentLength = visibleDiscussions.length;
+        const nextItems = discussions.slice(currentLength, currentLength + 3);
+
+        if (nextItems.length > 0) {
           setIsLoadingMore(true);
-          const currentLength = visibleDiscussions.length;
-          const nextItems = discussions.slice(currentLength, currentLength + 3);
-
-          if (nextItems.length > 0) {
-            setVisibleDiscussions((prev) => [...prev, ...nextItems]);
-          }
-
-          setHasMore(currentLength + nextItems.length < discussions.length);
+          setVisibleDiscussions((prev) => [...prev, ...nextItems]);
           setIsLoadingMore(false);
         }
-      },
-      { root: null, rootMargin: "20px" }
-    );
+      }
+    });
 
     const currentLoader = loaderRef.current;
     if (currentLoader) {
@@ -89,9 +79,8 @@ const PageDiscuss: React.FC = () => {
         observer.unobserve(currentLoader);
       }
     };
-  }, [visibleDiscussions, discussions, hasMore, isLoadingMore]);
+  }, [visibleDiscussions, discussions, isLoadingMore]);
 
-  // Mutasi untuk menambahkan diskusi baru
   const addDiscussionMutation = useMutation({
     mutationFn: async (newData: {
       newDiscuss: Discussion;
@@ -122,10 +111,9 @@ const PageDiscuss: React.FC = () => {
     addDiscussionMutation.mutate({ newDiscuss, newComment });
   };
 
-  // Status loading dan error
   if (loadingDiscussions || loadingComments) {
     return (
-      <div className="flex justify-center items-center min-h-[200px]">
+      <div className="flex justify-center items-center">
         <Loader2 className="h-6 w-6 animate-spin text-primary" />
       </div>
     );
@@ -133,7 +121,7 @@ const PageDiscuss: React.FC = () => {
 
   if (discussionsError || commentsError) {
     return (
-      <div className="flex justify-center items-center min-h-[200px]">
+      <div className="flex justify-center items-center">
         <p>Error memuat diskusi atau komentar.</p>
       </div>
     );
@@ -143,8 +131,8 @@ const PageDiscuss: React.FC = () => {
     <div className="space-y-4">
       <AddDiscuss onSubmitSuccess={handleNewDiscuss} />
       <CardDiscuss data={visibleDiscussions} comment={comments} />
-      {hasMore && (
-        <div ref={loaderRef} className="flex justify-center items-center py-8">
+      {visibleDiscussions.length < discussions.length && (
+        <div ref={loaderRef} className="flex justify-center items-center py-4">
           <Loader2 className="h-6 w-6 animate-spin text-primary" />
         </div>
       )}
