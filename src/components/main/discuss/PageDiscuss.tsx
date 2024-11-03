@@ -144,7 +144,7 @@ const PageDiscuss: React.FC = () => {
       <AddDiscuss onSubmitSuccess={handleNewDiscuss} />
       <CardDiscuss data={visibleDiscussions} comment={comments} />
       {hasMore && (
-        <div ref={loaderRef} className="flex justify-center items-center py-4">
+        <div ref={loaderRef} className="flex justify-center items-center py-8">
           <Loader2 className="h-6 w-6 animate-spin text-primary" />
         </div>
       )}
