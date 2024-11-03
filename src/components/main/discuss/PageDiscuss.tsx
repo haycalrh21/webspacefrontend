@@ -7,14 +7,14 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { Loader2 } from "lucide-react";
 
-// Fetch discussions from API
+// Fetch discussions dari API
 const fetchDiscussions = async (): Promise<Discussion[]> => {
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
   const response = await axios.get(`${API_URL}/discuss`);
   return response.data;
 };
 
-// Fetch comments from API
+// Fetch comments dari API
 const fetchComments = async (): Promise<CommentsData[]> => {
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
   const response = await axios.get(`${API_URL}/comment`);
@@ -30,7 +30,7 @@ const PageDiscuss: React.FC = () => {
   const loaderRef = useRef<HTMLDivElement>(null);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
-  // Query for discussions
+  // Query untuk diskusi
   const {
     data: discussions = [],
     isLoading: loadingDiscussions,
@@ -40,7 +40,7 @@ const PageDiscuss: React.FC = () => {
     queryFn: fetchDiscussions,
   });
 
-  // Query for comments
+  // Query untuk komentar
   const {
     data: comments = [],
     isLoading: loadingComments,
@@ -50,7 +50,7 @@ const PageDiscuss: React.FC = () => {
     queryFn: fetchComments,
   });
 
-  // Initialize visible discussions when discussions are fetched
+  // Inisialisasi diskusi yang terlihat saat diskusi diambil
   useEffect(() => {
     if (discussions.length > 0) {
       setVisibleDiscussions(discussions.slice(0, 9));
@@ -58,7 +58,7 @@ const PageDiscuss: React.FC = () => {
     }
   }, [discussions]);
 
-  // Intersection Observer for lazy loading
+  // Intersection Observer untuk lazy loading
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -91,7 +91,7 @@ const PageDiscuss: React.FC = () => {
     };
   }, [visibleDiscussions, discussions, hasMore, isLoadingMore]);
 
-  // Mutation for adding a new discussion
+  // Mutasi untuk menambahkan diskusi baru
   const addDiscussionMutation = useMutation({
     mutationFn: async (newData: {
       newDiscuss: Discussion;
@@ -122,7 +122,7 @@ const PageDiscuss: React.FC = () => {
     addDiscussionMutation.mutate({ newDiscuss, newComment });
   };
 
-  // Loading and error states
+  // Status loading dan error
   if (loadingDiscussions || loadingComments) {
     return (
       <div className="flex justify-center items-center min-h-[200px]">
@@ -134,7 +134,7 @@ const PageDiscuss: React.FC = () => {
   if (discussionsError || commentsError) {
     return (
       <div className="flex justify-center items-center min-h-[200px]">
-        <p>Error loading discussions or comments.</p>
+        <p>Error memuat diskusi atau komentar.</p>
       </div>
     );
   }
@@ -144,7 +144,7 @@ const PageDiscuss: React.FC = () => {
       <AddDiscuss onSubmitSuccess={handleNewDiscuss} />
       <CardDiscuss data={visibleDiscussions} comment={comments} />
       {hasMore && (
-        <div ref={loaderRef} className="flex justify-center items-center py-8">
+        <div ref={loaderRef} className="flex justify-center items-center py-4">
           <Loader2 className="h-6 w-6 animate-spin text-primary" />
         </div>
       )}
