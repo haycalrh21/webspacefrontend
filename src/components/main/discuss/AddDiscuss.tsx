@@ -15,9 +15,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { discusscategory } from "./listdiscuss";
+import { CommentsData, Discussion } from "@/types/types";
 
 interface AddDiscussProps {
-  onSubmitSuccess: (newDiscuss: any) => void;
+  onSubmitSuccess: (newDiscuss: Discussion, newComment: CommentsData) => void;
 }
 
 export default function AddDiscuss({ onSubmitSuccess }: AddDiscussProps) {
@@ -56,7 +57,12 @@ export default function AddDiscuss({ onSubmitSuccess }: AddDiscussProps) {
         name: sessionData?.user?.name,
       };
 
-      onSubmitSuccess(newDiscuss); // Panggil fungsi untuk update daftar diskusi
+      const newComment = {
+        ...response.data,
+        name: sessionData?.user?.name,
+        userId: sessionData?.user?.id,
+      };
+      onSubmitSuccess(newDiscuss, newComment); // Panggil fungsi untuk update daftar diskusi
       setDialogOpen(false);
       alert("Diskusi berhasil ditambahkan!");
     } catch (error) {

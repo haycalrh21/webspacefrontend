@@ -4,6 +4,7 @@ import "./globals.css";
 import ProviderSession from "@/components/SessionProvider";
 import Navbar from "@/components/Navbar";
 import NavbarAvatar from "@/components/Navbars";
+import QueryProviders from "@/components/QueryProvider";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -40,9 +41,11 @@ export default function RootLayout({
       <body>
         <ProviderSession>
           <NavbarAvatar />
-          <div className="w-full h-screen bg-background dark:bg-black text-foreground dark:text-white">
-            {children}
-          </div>
+          <QueryProviders>
+            <div className="w-full h-screen bg-background dark:bg-black text-foreground dark:text-white">
+              {children}
+            </div>
+          </QueryProviders>
         </ProviderSession>
       </body>
     </html>

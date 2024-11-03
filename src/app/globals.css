@@ -3,25 +3,38 @@
 @tailwind utilities;
 
 html {
-  scroll-behavior: smooth;
+  scroll-behavior: smooth; /* Mengatur perilaku scroll menjadi halus */
 }
 
 body {
   font-family: Arial, Helvetica, sans-serif;
-  /* Menambahkan transisi untuk warna background di sini */
-  transition: background-color 0.5s ease-in-out;
-  @apply bg-slate-200 dark:bg-black;
+  transition: background-color 0.5s ease-in-out; /* Transisi untuk warna background */
+  @apply bg-slate-200 dark:bg-black; /* Menggunakan utility class Tailwind untuk latar belakang */
 }
 
 @layer utilities {
   .text-balance {
-    text-wrap: balance;
+    text-wrap: balance; /* Menggunakan properti CSS untuk pembungkusan teks */
+  }
+
+  .scroll-hidden {
+    overflow-y: scroll; /* Memungkinkan scroll vertikal */
+  }
+
+  /* Sembunyikan scrollbar */
+  .scroll-hidden::-webkit-scrollbar {
+    width: 0; /* Untuk Chrome, Safari, dan Opera */
+  }
+
+  .scroll-hidden {
+    -ms-overflow-style: none; /* Untuk Internet Explorer dan Edge */
+    scrollbar-width: none; /* Untuk Firefox */
   }
 }
 
 @layer base {
   :root {
-    --radius: 0.5rem;
+    --radius: 0.5rem; /* Variabel CSS untuk radius */
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
     --sidebar-primary: 240 5.9% 10%;
@@ -31,6 +44,7 @@ body {
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
+
   .dark {
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;

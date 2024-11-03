@@ -18,7 +18,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { convertToWIB } from "@/lib/dateHelpers";
+
 import { Label } from "@radix-ui/react-dropdown-menu";
 import axios from "axios";
 import moment from "moment";
@@ -54,7 +54,7 @@ const DiscussDetailDialog: React.FC<BlogDetailDialogProps> = ({
     const data = await response.json();
     const match = data.filter((item: any) => item.postId === blog.id);
     setComment(match);
-    console.log(match);
+    // console.log(match);
   };
 
   useEffect(() => {
@@ -97,10 +97,10 @@ const DiscussDetailDialog: React.FC<BlogDetailDialogProps> = ({
     setIsCommentFormVisible(true); // Reset blog yang dipilih
   };
 
-  console.log(blog.id);
+  // console.log(blog.id);
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-[800px] w-full p-10 max-h-[80vh] overflow-y-auto">
+      <DialogContent className="scroll-hidden max-w-[800px] w-full p-10 max-h-[80vh]">
         <DialogHeader>
           <DialogTitle className="text-foreground dark:text-gray-300 flex justify-between">
             <p className=" text-sm text-foreground dark:text-gray-300">
@@ -155,7 +155,11 @@ const DiscussDetailDialog: React.FC<BlogDetailDialogProps> = ({
                   {item.comment}
                 </CardHeader>
                 <CardContent></CardContent>
-                <CardFooter>{item.createdAt}</CardFooter>
+                <CardFooter>
+                  {moment(item.created_at)
+                    .tz("Asia/Jakarta")
+                    .format("YYYY-MM-DD HH:mm:ss")}
+                </CardFooter>
               </Card>
             ))
           ) : (
