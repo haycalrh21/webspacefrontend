@@ -13,7 +13,13 @@ import DiscussDetailDialog from "./Discuss";
 import { MessageCircle } from "lucide-react";
 import moment from "moment-timezone"; // Import Moment.js
 
-export default function CardDiscuss({ data, comment }: any) {
+export default function CardDiscuss({
+  data,
+  comment = [],
+}: {
+  data: any;
+  comment?: any[];
+}) {
   const [selectedBlog, setSelectedBlog] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -31,8 +37,8 @@ export default function CardDiscuss({ data, comment }: any) {
     <div className="mt-4">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3">
         {data.map((item: any) => {
-          // Filter comments that match the current item's id
-          const match = comment.filter(
+          // Pastikan `comment` sudah terdefinisi dan gunakan nilai default []
+          const match = (comment || []).filter(
             (commentItem: any) => commentItem.postId === item.id
           );
           return (

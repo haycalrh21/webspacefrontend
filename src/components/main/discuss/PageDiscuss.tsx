@@ -30,13 +30,21 @@ export default function PageDiscuss() {
   const loaderRef = useRef<HTMLDivElement>(null);
 
   // Query for discussions
-  const { data: discussions = [], isLoading: loadingDiscussions } = useQuery({
+  const {
+    data: discussions = [],
+    isLoading: loadingDiscussions,
+    isError: discussionsError,
+  } = useQuery({
     queryKey: ["discussions"],
     queryFn: fetchDiscussions,
   });
 
   // Query for comments
-  const { data: comments = [], isLoading: loadingComments } = useQuery({
+  const {
+    data: comments = [],
+    isLoading: loadingComments,
+    isError: commentsError,
+  } = useQuery({
     queryKey: ["comments"],
     queryFn: fetchComments,
   });
@@ -62,7 +70,9 @@ export default function PageDiscuss() {
           if (nextItems.length > 0) {
             setVisibleDiscussions((prev) => [...prev, ...nextItems]);
             // Check if we've reached the end
-            setHasMore(currentLength + 3 < discussions.length);
+            setHasMore(currentLength + nextItems.length < discussions.length);
+          } else {
+            setHasMore(false); // No more items to load
           }
         }
       },
@@ -121,6 +131,14 @@ export default function PageDiscuss() {
     );
   }
 
+  if (discussionsError || commentsError) {
+    return (
+      <div className="flex justify-center items-center min-h-[200px]">
+        <p>Error loading discussions or comments.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
       <AddDiscuss onSubmitSuccess={handleNewDiscuss} />
@@ -128,7 +146,7 @@ export default function PageDiscuss() {
 
       {/* Loader reference element */}
       {hasMore && (
-        <div ref={loaderRef} className="flex justify-center items-center py-8">
+        <div ref={loaderRef} className="flex justify-center items-center py-4">
           <Loader2 className="h-6 w-6 animate-spin text-primary" />
         </div>
       )}
