@@ -16,7 +16,7 @@ import Link from "next/link";
 export default function AvatarNavbar() {
   const { data: session } = useSession();
   return (
-    <div>
+    <div className="items-end">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Avatar className="cursor-pointer">

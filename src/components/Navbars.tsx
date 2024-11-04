@@ -14,9 +14,10 @@ export default function NavbarAvatar() {
   if (pathname.startsWith("/dashboard")) {
     return null;
   }
+
   return (
     <>
-      <header className="relative z-20 w-full  bg-background dark:bg-black border-b border-black dark:border-gray-700 shadow-lg shadow-slate-700/5 after:absolute after:left-0 after:top-full after:z-10 after:block after:h-px after:w-full after:bg-slate-200 lg:border-slate-200 lg:backdrop-blur-sm lg:after:hidden">
+      <header className="sticky top-0 z-20 w-full bg-background dark:bg-black border-b border-black dark:border-gray-700 shadow-lg shadow-slate-700/5 after:absolute after:left-0 after:top-full after:z-10 after:block after:h-px after:w-full after:bg-slate-200 lg:border-slate-200 lg:backdrop-blur-sm lg:after:hidden">
         <div className="max-w-7xl mx-auto w-full">
           <nav
             aria-label="main navigation"
@@ -35,13 +36,13 @@ export default function NavbarAvatar() {
             </Link>
             {/* Mobile trigger */}
             <button
-              className={`relative order-10 block h-10 w-10 self-center lg:hidden
+              className={`relative order-10 block h-10 w-10 self-center lg:hidden outlinered-500
               ${
                 isToggleOpen
                   ? "visible opacity-100 [&_span:nth-child(1)]:w-6 [&_span:nth-child(1)]:translate-y-0 [&_span:nth-child(1)]:rotate-45 [&_span:nth-child(2)]:-rotate-45 [&_span:nth-child(3)]:w-0 "
                   : ""
               }
-            `}
+              `}
               onClick={() => setIsToggleOpen(!isToggleOpen)}
               aria-expanded={isToggleOpen ? "true" : "false"}
               aria-label="Toggle navigation"
@@ -65,7 +66,7 @@ export default function NavbarAvatar() {
             <ul
               role="menubar"
               aria-label="Select page"
-              className={`absolute left-0 top-0 z-[-1] h-[28.5rem] w-full justify-center overflow-hidden overflow-y-auto overscroll-contain bg-white/90 px-8 pb-12 pt-24 font-medium transition-[opacity,visibility] duration-300 lg:visible lg:relative lg:top-0 lg:z-0 lg:flex lg:h-full lg:w-auto lg:items-center lg:bg-white/0 lg:px-0 lg:py-0 lg:pt-0 lg:opacity-100 ${
+              className={`absolute left-0 top-0 z-[-1] h-[28.5rem] w-full justify-center overflow-hidden overflow-y-auto overscroll-contain bg-white/90 dark:bg-black/90 px-8 pb-12 pt-24 font-medium transition-[opacity,visibility] duration-300 lg:visible lg:relative lg:top-0 lg:z-0 lg:flex lg:h-full lg:w-auto lg:items-center lg:bg-transparent lg:px-0 lg:py-0 lg:pt-0 lg:opacity-100 ${
                 isToggleOpen
                   ? "visible opacity-100 backdrop-blur-sm"
                   : "invisible opacity-0"
@@ -106,7 +107,12 @@ export default function NavbarAvatar() {
                 <ButtonDarkMode />
               </li>
             </ul>
-            <div className="mr-6 flex items-center px-6 lg:ml-0 lg:p-0">
+            {/* Avatar Navbar positioned near the hamburger button on mobile */}
+            <div className="ml-auto mt-6 lg:hidden">
+              <AvatarNavbar />
+            </div>
+            {/* Avatar Navbar in its original position on desktop */}
+            <div className="hidden lg:flex items-center gap-4 mr-6 px-6 lg:ml-0 lg:p-0">
               <AvatarNavbar />
             </div>
           </nav>
