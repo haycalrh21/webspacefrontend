@@ -1,10 +1,18 @@
 import CardBlog from "@/components/main/blog/CardBlog";
+import axios from "axios";
 import React from "react";
 
-export default function page() {
+export default async function page() {
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+  const res = await axios.get(`${API_URL}/blog`);
+  const datas = res.data;
+  // console.log(datas);
+  if (!datas) {
+    return <div>Not found</div>;
+  }
   return (
     <div>
-      <CardBlog />
+      <CardBlog data={datas} />
     </div>
   );
 }

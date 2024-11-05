@@ -1,4 +1,5 @@
 // components/BlogDetailDialog.tsx
+import HtmlContent from "@/components/HtmlContent";
 import {
   Dialog,
   DialogContent,
@@ -7,14 +8,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import moment from "moment-timezone";
 
 interface Blog {
   id: number;
   title: string;
-  description: string;
-  image: string;
-  date: string;
-  author: string;
+  content: string;
+  imageUrls: string[];
+  createdAt: string;
+  username: string;
 }
 
 interface BlogDetailDialogProps {
@@ -32,30 +34,37 @@ const BlogDetailDialog: React.FC<BlogDetailDialogProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-[800px] w-full">
+      <DialogContent className="max-w-[800px] w-full p-6 md:p-10 max-h-[80vh] scroll-hidden">
         {" "}
         {/* Set width here */}
         <DialogHeader>
-          <DialogTitle className="text-foreground dark:text-gray-300">
-            {blog.title}
+          <DialogTitle className="text-foreground dark:text-gray-300 flex justify-between">
+            <p>{blog.title}</p>
+
+            <p className="text-foreground dark:text-gray-300">
+              {moment
+                .tz(blog.createdAt, "Asia/Jakarta")
+                .format("YYYY-MM-DD HH:mm:ss")}
+            </p>
           </DialogTitle>
+          <div>
+            <p className=" text-foreground dark:text-gray-300">
+              @{blog.username}
+            </p>
+          </div>
           <DialogDescription className="text-foreground dark:text-gray-300">
-            {blog.description}
+            <img
+              src={blog.imageUrls[0]}
+              alt="Blog image"
+              className="w-full h-auto"
+            />
           </DialogDescription>
         </DialogHeader>
-        <img src={blog.image} alt="Blog image" className="w-full h-auto" />
-        <DialogFooter className="flex justify-between items-center">
-          <div>
-            <p className=" text-foreground dark:text-gray-300">
-              Date: {blog.date}
-            </p>
-          </div>
-          <div>
-            <p className=" text-foreground dark:text-gray-300">
-              Author: {blog.author}
-            </p>
-          </div>
-        </DialogFooter>
+        <HtmlContent
+          content={blog.content}
+          className="text-foreground dark:text-gray-300"
+        />
+        <DialogFooter className="flex justify-between items-center"></DialogFooter>
       </DialogContent>
     </Dialog>
   );

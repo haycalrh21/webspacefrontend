@@ -94,14 +94,14 @@ export default function NavbarAvatar() {
                 </Link>
               </li>
               <li role="none" className="flex items-center">
-                <a
+                <Link
                   role="menuitem"
                   aria-haspopup="false"
                   className="flex items-center gap-2 py-4 text-foreground dark:text-gray-300 hover:text-gray-400 focus:text-emerald-600 focus:outline-none focus-visible:outline-none lg:px-8"
                   href="/about"
                 >
-                  <span>About me</span>
-                </a>
+                  <span>About</span>
+                </Link>
               </li>
               <li role="none" className="flex items-center mr-4">
                 <ButtonDarkMode />
