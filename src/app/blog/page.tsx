@@ -1,5 +1,6 @@
 import CardBlog from "@/components/main/blog/CardBlog";
 import axios from "axios";
+import { Metadata } from "next";
 import React from "react";
 
 export default async function page() {
@@ -16,4 +17,10 @@ export default async function page() {
     </div>
   );
 }
+
+export const metadata: Metadata = {
+  title: "Blog",
+  description: "Blog",
+};
+
 export const dynamic = "force-dynamic";

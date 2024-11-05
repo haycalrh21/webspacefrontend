@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import moment from "moment-timezone";
+import { Metadata } from "next";
 
 interface Blog {
   id: number;
@@ -32,6 +33,10 @@ const BlogDetailDialog: React.FC<BlogDetailDialogProps> = ({
 }) => {
   if (!blog) return null;
 
+  const metadata: Metadata = {
+    title: blog.title,
+    description: blog.content,
+  };
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-[800px] w-full p-6 md:p-10 max-h-[80vh] scroll-hidden">
@@ -71,3 +76,5 @@ const BlogDetailDialog: React.FC<BlogDetailDialogProps> = ({
 };
 
 export default BlogDetailDialog;
+
+export const metadata: Metadata = {};

@@ -2,6 +2,11 @@
 import PageDiscuss from "@/components/main/discuss/PageDiscuss";
 
 import Meteors from "@/components/ui/meteors";
+import { Metadata } from "next";
+export const metadata: Metadata = {
+  title: "Discuss",
+  description: "Discuss",
+};
 
 export default async function Page() {
   return (
