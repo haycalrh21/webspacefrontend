@@ -1,5 +1,6 @@
 "use client";
 import { CustomSession } from "@/app/api/auth/[...nextauth]/authOption";
+import HtmlContent from "@/components/HtmlContent";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -142,7 +143,7 @@ const DiscussDetailDialog: React.FC<BlogDetailDialogProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-[800px] w-full p-6 md:p-10 max-h-[80vh] scroll-hidden">
+      <DialogContent className="max-w-[1200px] w-full p-6 md:p-10 max-h-[80vh] scroll-hidden">
         <DialogHeader>
           <DialogTitle className="flex justify-between items-start">
             <span className="text-sm text-foreground dark:text-gray-300">
@@ -158,7 +159,11 @@ const DiscussDetailDialog: React.FC<BlogDetailDialogProps> = ({
             {blog.title}
           </p>
           <DialogDescription className="text-md text-foreground dark:text-gray-300 py-4 text-left">
-            {blog.description} <br />
+            {/* <div dangerouslySetInnerHTML={{ __html: blog.description }} /> */}
+            <HtmlContent
+              content={blog.description}
+              className=" w-full  scroll-hidden"
+            />
             <span
               className={`text-sm text-foreground dark:text-gray-300 rounded-md px-2 py-1 ${
                 blog.category === "Bug" ? "bg-red-500" : "bg-green-500"
@@ -184,7 +189,7 @@ const DiscussDetailDialog: React.FC<BlogDetailDialogProps> = ({
                   placeholder="Type your comment here..."
                   required
                 />
-                <Button type="submit" disabled={loading} className="w-full">
+                <Button variant="default" type="submit" disabled={loading}>
                   {loading ? "Loading..." : "Submit"}
                 </Button>
               </form>

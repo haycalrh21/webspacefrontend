@@ -2,7 +2,6 @@ import AddMessage from "@/components/dashboard/telegram/AddMessage";
 import CardIndexTelegram from "@/components/dashboard/telegram/CardIndexTelegram";
 
 import axios from "axios";
-import { Suspense } from "react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 export default async function page() {
@@ -15,10 +14,8 @@ export default async function page() {
   }
   return (
     <div className="flex flex-col gap-4 py-4">
-      <Suspense fallback={<div>Loading...</div>}>
-        <AddMessage />
-        <CardIndexTelegram data={res.data} />
-      </Suspense>
+      <AddMessage />
+      <CardIndexTelegram data={res.data} />
     </div>
   );
 }

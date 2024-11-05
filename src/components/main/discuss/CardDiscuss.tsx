@@ -11,7 +11,7 @@ import {
 import { useState } from "react";
 import DiscussDetailDialog from "./Discuss";
 import { MessageCircle } from "lucide-react";
-import moment from "moment-timezone"; // Import Moment.js
+import moment from "moment-timezone";
 
 export default function CardDiscuss({
   data,
@@ -22,7 +22,7 @@ export default function CardDiscuss({
 }) {
   const [selectedBlog, setSelectedBlog] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  console.log(data);
+
   const openDialog = (blog: any) => {
     setSelectedBlog(blog);
     setIsDialogOpen(true);
@@ -33,14 +33,19 @@ export default function CardDiscuss({
     setSelectedBlog(null);
   };
 
+  // Helper function to truncate text and add ellipsis
+  const truncateText = (text: string, maxLength: number) => {
+    return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
+  };
+
   return (
     <div className="mt-4">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3">
         {data.map((item: any) => {
-          // Pastikan `comment` sudah terdefinisi dan gunakan nilai default []
           const match = (comment || []).filter(
             (commentItem: any) => commentItem.postId === item.id
           );
+
           return (
             <Card
               key={item.id}
@@ -59,7 +64,12 @@ export default function CardDiscuss({
                 <p className="text-md">{item.title}</p>
               </CardHeader>
               <CardContent>
-                <CardDescription>{item.description}</CardDescription>
+                <CardDescription
+                  dangerouslySetInnerHTML={{
+                    __html: truncateText(item.description, 100),
+                  }}
+                  className="text-sm line-clamp-3 overflow-hidden"
+                ></CardDescription>
                 <span
                   className={`text-sm text-foreground dark:text-gray-300 rounded-md px-2 py-1 ${
                     item.category === "Bug" ? "bg-red-500" : "bg-green-500"
@@ -79,7 +89,7 @@ export default function CardDiscuss({
         })}
       </div>
 
-      {/* Dialog untuk menampilkan detail diskusi */}
+      {/* Dialog for displaying discussion details */}
       <DiscussDetailDialog
         isOpen={isDialogOpen}
         onClose={closeDialog}
