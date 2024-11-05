@@ -6,8 +6,7 @@ import axios from "axios";
 import React from "react";
 
 export default async function page() {
-  const API_URL = process.env.NEXT_PUBLIC_API_URL;
-  const res = await axios.get(`${API_URL}/blog`);
+  const res = await myAxios.get(`/blog`);
   // console.log(res);
   return (
     <div>

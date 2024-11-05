@@ -1,11 +1,12 @@
 import CardBlog from "@/components/main/blog/CardBlog";
+import myAxios from "@/lib/axios.config";
 import axios from "axios";
 import { Metadata } from "next";
 import React from "react";
 
 export default async function page() {
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
-  const res = await axios.get(`${API_URL}/blog`);
+  const res = await myAxios.get(`/blog`);
   const datas = res.data;
   // console.log(datas);
   if (!datas) {

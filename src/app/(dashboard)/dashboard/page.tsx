@@ -8,22 +8,21 @@ import {
 } from "@/components/ui/card";
 
 import NumberTicker from "@/components/ui/number-ticker";
+import myAxios from "@/lib/axios.config";
 import axios from "axios";
 import React from "react";
 
 export default async function Dashboard() {
-  const API_URL = process.env.NEXT_PUBLIC_API_URL;
-
-  const resBot = await axios.get(`${API_URL}/bot`);
+  const resBot = await myAxios.get(`/bot`);
   const databot = resBot.data;
 
-  const resDiscuss = await axios.get(`${API_URL}/discuss`);
+  const resDiscuss = await myAxios.get(`/discuss`);
   const dataDiscuss = resDiscuss.data;
 
-  const resBlog = await axios.get(`${API_URL}/blog`);
+  const resBlog = await myAxios.get(`/blog`);
   const dataBlog = resBlog.data;
 
-  const resTask = await axios.get(`${API_URL}/tasks`);
+  const resTask = await myAxios.get(`/tasks`);
   const dataTask = resTask.data;
 
   const lengths = [

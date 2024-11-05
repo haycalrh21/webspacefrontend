@@ -7,14 +7,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import myAxios from "@/lib/axios.config";
 import axios from "axios";
 import { Suspense, useEffect, useState } from "react";
 export default function CardIndexProject() {
-  const API_URL = process.env.NEXT_PUBLIC_API_URL;
   const [project, setProject] = useState([]);
 
   const fetchData = async () => {
-    const response = await axios.get(`${API_URL}/project`);
+    const response = await myAxios.get(`/project`);
     setProject(response.data);
   };
   useEffect(() => {

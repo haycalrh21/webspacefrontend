@@ -1,33 +1,28 @@
 "use client";
-import React, { useEffect, useState, useRef } from "react";
+import React, { Suspense } from "react";
 import AddDiscuss from "./AddDiscuss";
 import CardDiscuss from "./CardDiscuss";
 import { CommentsData, Discussion } from "@/types/types";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { Loader2 } from "lucide-react";
+import Loading from "@/app/discuss/loading";
+import myAxios from "@/lib/axios.config";
 
 // Fungsi untuk mengambil diskusi dari API
 const fetchDiscussions = async (): Promise<Discussion[]> => {
-  const API_URL = process.env.NEXT_PUBLIC_API_URL;
-  const response = await axios.get(`${API_URL}/discuss`);
+  const response = await myAxios.get(`/discuss`);
   return response.data;
 };
 
 // Fungsi untuk mengambil komentar dari API
 const fetchComments = async (): Promise<CommentsData[]> => {
-  const API_URL = process.env.NEXT_PUBLIC_API_URL;
-  const response = await axios.get(`${API_URL}/comment`);
+  const response = await myAxios.get(`/comment`);
   return response.data;
 };
 
 const PageDiscuss: React.FC = () => {
   const queryClient = useQueryClient();
-  const [visibleDiscussions, setVisibleDiscussions] = useState<Discussion[]>(
-    []
-  );
-  const loaderRef = useRef<HTMLDivElement>(null);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   // Query untuk diskusi
   const {
@@ -49,42 +44,6 @@ const PageDiscuss: React.FC = () => {
     queryFn: fetchComments,
   });
 
-  // Inisialisasi visibleDiscussions ketika diskusi diambil
-  useEffect(() => {
-    if (discussions.length > 0) {
-      setVisibleDiscussions(discussions.slice(0, 9));
-    }
-  }, [discussions]);
-
-  // Intersection Observer untuk lazy loading
-  useEffect(() => {
-    const observer = new IntersectionObserver((entries) => {
-      const target = entries[0];
-      if (target.isIntersecting && !isLoadingMore) {
-        const currentLength = visibleDiscussions.length;
-        const nextItems = discussions.slice(currentLength, currentLength + 3);
-
-        if (nextItems.length > 0) {
-          setIsLoadingMore(true);
-          setVisibleDiscussions((prev) => [...prev, ...nextItems]);
-
-          setIsLoadingMore(false);
-        }
-      }
-    });
-
-    const currentLoader = loaderRef.current;
-    if (currentLoader) {
-      observer.observe(currentLoader);
-    }
-
-    return () => {
-      if (currentLoader) {
-        observer.unobserve(currentLoader);
-      }
-    };
-  }, [visibleDiscussions, discussions, isLoadingMore]);
-
   // Mutasi untuk menambahkan diskusi baru
   const addDiscussionMutation = useMutation({
     mutationFn: async (newData: {
@@ -102,10 +61,6 @@ const PageDiscuss: React.FC = () => {
         newData.newComment,
         ...oldData,
       ]);
-      setVisibleDiscussions((prev) => [
-        newData.newDiscuss,
-        ...prev.slice(0, 5),
-      ]);
     },
   });
 
@@ -118,16 +73,12 @@ const PageDiscuss: React.FC = () => {
 
   // Status loading dan error
   if (loadingDiscussions || loadingComments) {
-    return (
-      <div className="flex justify-center items-center ">
-        <Loader2 className="h-6 w-6 animate-spin text-primary" />
-      </div>
-    );
+    return <Loading />;
   }
 
   if (discussionsError || commentsError) {
     return (
-      <div className="flex justify-center items-center ]">
+      <div className="flex justify-center items-center">
         <p>Error memuat diskusi atau komentar.</p>
       </div>
     );
@@ -135,13 +86,10 @@ const PageDiscuss: React.FC = () => {
 
   return (
     <div className="space-y-4">
-      <AddDiscuss onSubmitSuccess={handleNewDiscuss} />
-      <CardDiscuss data={visibleDiscussions} comment={comments} />
-      {visibleDiscussions.length < discussions.length && (
-        <div ref={loaderRef} className="flex justify-center items-center py-4">
-          <Loader2 className="h-6 w-6 animate-spin text-primary" />
-        </div>
-      )}
+      <Suspense fallback={<Loading />}>
+        <AddDiscuss onSubmitSuccess={handleNewDiscuss} />
+        <CardDiscuss data={discussions} comment={comments} />
+      </Suspense>
     </div>
   );
 };

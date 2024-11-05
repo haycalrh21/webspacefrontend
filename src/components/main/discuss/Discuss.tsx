@@ -67,6 +67,10 @@ const DiscussDetailDialog: React.FC<BlogDetailDialogProps> = ({
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
+    if (!sessionData?.user?.id) {
+      toast.error("Please login first");
+      return;
+    }
     try {
       const formData = new FormData(event.currentTarget);
       const comment = formData.get("comment") as string;

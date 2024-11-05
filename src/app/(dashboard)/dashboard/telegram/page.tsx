@@ -1,11 +1,9 @@
 import AddMessage from "@/components/dashboard/telegram/AddMessage";
 import CardIndexTelegram from "@/components/dashboard/telegram/CardIndexTelegram";
+import myAxios from "@/lib/axios.config";
 
-import axios from "axios";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
 export default async function page() {
-  const res = await axios.get(`${API_URL}/bot`);
+  const res = await myAxios.get(`/bot`);
   const datas = res.data;
   // console.log(datas);
 
